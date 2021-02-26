@@ -104,6 +104,7 @@ bool q_insert_tail(queue_t *q, char *s)
     newt->next = NULL;
     if (q->tail == NULL) {
         q->tail = newt;
+        q->head = newt;
     } else {
         q->tail->next = newt;
         q->tail = q->tail->next;
@@ -192,4 +193,72 @@ void q_sort(queue_t *q)
 {
     /* TODO: You need to write the code for this function */
     /* TODO: Remove the above comment when you are about to implement. */
+    if (!q || !q->head)
+        return;
+    q->head = node_sort(q->head);
+    q->tail = q->head;
+    while (q->tail->next) {
+        q->tail = q->tail->next;
+    }
+}
+
+list_ele_t *node_sort(list_ele_t *node)
+{
+    if (!node)
+        return NULL;
+    if (!node->next)
+        return node;
+    list_ele_t *slow = node, *fast = node->next;
+    while (fast->next && fast->next->next) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    list_ele_t *mid = slow->next;
+    slow->next = NULL;
+
+    list_ele_t *left, *right;
+    left = node_sort(node);
+    right = node_sort(mid);
+
+    return merge_sort(left, right);
+}
+
+list_ele_t *merge_sort(list_ele_t *a, list_ele_t *b)
+{
+    if (!b)
+        return a;
+    if (!a)
+        return b;
+
+    list_ele_t *head, *curr;
+
+    if (strcmp(a->value, b->value) < 0) {
+        head = a;
+        curr = a;
+        a = a->next;
+    } else {
+        head = b;
+        curr = b;
+        b = b->next;
+    }
+
+    while (a && b) {
+        if (strcmp(a->value, b->value) < 0) {
+            curr->next = a;
+            a = a->next;
+        } else {
+            curr->next = b;
+            b = b->next;
+        }
+        curr = curr->next;
+    }
+
+    if (a) {
+        curr->next = a;
+    }
+
+    if (b) {
+        curr->next = b;
+    }
+    return head;
 }
