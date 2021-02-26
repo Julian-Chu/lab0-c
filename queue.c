@@ -5,6 +5,10 @@
 #include "harness.h"
 #include "queue.h"
 
+#ifndef strlcpy
+#define strlcpy(dst, src, sz) snprintf((dst), (sz), "%s", (src))
+#endif
+
 /*
  * Create empty queue.
  * Return NULL if could not allocate space.
@@ -40,7 +44,7 @@ void q_free(queue_t *q)
 /*
  * Attempt to insert element at head of queue.
  * Return true if successful.
- * Return false if q is NULL or could not allocate space.
+ * Retu:n false if q is NULL or could not allocate space.
  * Argument s points to the string to be stored.
  * The function must explicitly allocate space and copy the string into it.
  */
@@ -49,21 +53,26 @@ bool q_insert_head(queue_t *q, char *s)
     list_ele_t *newh;
     if (q == NULL)
         return false;
-    newh = malloc(sizeof(list_ele_t));
 
+    newh = malloc(sizeof(list_ele_t));
     if (newh == NULL)
         return false;
     /* Don't forget to allocate space for the string and copy it */
     /* What if either call to malloc returns NULL? */
-    newh->value = malloc(sizeof(strlen(s)));
+    newh->value = malloc(sizeof(char) * (strlen(s) + 1));
     if (newh->value == NULL) {
         free(newh);
         return false;
     }
+    newh->next = NULL;
 
-    strlcpy(newh->value, s);
+    strlcpy(newh->value, s, strlen(s) + 1);
     newh->next = q->head;
+    if (q->head == NULL) {
+        q->tail = newh;
+    }
     q->head = newh;
+    q->size++;
     return true;
 }
 
@@ -78,19 +87,28 @@ bool q_insert_tail(queue_t *q, char *s)
 {
     /* TODO: You need to write the complete code for this function */
     /* Remember: It should operate in O(1) time */
-    /* TODO: Remove the above comment when you are about to implement. */
     if (q == NULL)
         return false;
     list_ele_t *newt;
-    /* TODO: What should you do if the q is NULL? */
     newt = malloc(sizeof(list_ele_t));
     if (newt == NULL)
         return false;
+    newt->value = malloc(sizeof(char) * (strlen(s) + 1));
+    if (newt->value == NULL) {
+        free(newt);
+        return false;
+    }
     /* Don't forget to allocate space for the string and copy it */
     /* What if either call to malloc returns NULL? */
-    strlcpy(newt->value, s);
-    q->tail->next = newt;
-    q->tail = newt;
+    strlcpy(newt->value, s, strlen(s) + 1);
+    newt->next = NULL;
+    if (q->tail == NULL) {
+        q->tail = newt;
+    } else {
+        q->tail->next = newt;
+        q->tail = q->tail->next;
+    }
+    q->size++;
     return true;
 }
 
