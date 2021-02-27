@@ -16,7 +16,7 @@
 queue_t *q_new()
 {
     queue_t *q = malloc(sizeof(queue_t));
-    if (q == NULL)
+    if (!q)
         return NULL;
     q->head = NULL;
     q->tail = NULL;
@@ -27,11 +27,11 @@ queue_t *q_new()
 /* Free all storage used by queue */
 void q_free(queue_t *q)
 {
-    if (q == NULL)
+    if (!q)
         return;
     /* Free queue structure */
     list_ele_t *node = q->head;
-    while (node != NULL) {
+    while (node) {
         free(node->value);
         list_ele_t *tmp = node;
         node = node->next;
@@ -51,16 +51,15 @@ void q_free(queue_t *q)
 bool q_insert_head(queue_t *q, char *s)
 {
     list_ele_t *newh;
-    if (q == NULL)
+    if (!q)
         return false;
 
     newh = malloc(sizeof(list_ele_t));
-    if (newh == NULL)
+    if (!newh)
         return false;
-    /* Don't forget to allocate space for the string and copy it */
-    /* What if either call to malloc returns NULL? */
+
     newh->value = malloc(sizeof(char) * (strlen(s) + 1));
-    if (newh->value == NULL) {
+    if (!newh->value) {
         free(newh);
         return false;
     }
@@ -68,7 +67,7 @@ bool q_insert_head(queue_t *q, char *s)
 
     strlcpy(newh->value, s, strlen(s) + 1);
     newh->next = q->head;
-    if (q->head == NULL) {
+    if (!q->head) {
         q->tail = newh;
     }
     q->head = newh;
@@ -89,12 +88,11 @@ bool q_insert_tail(queue_t *q, char *s)
     /* Remember: It should operate in O(1) time */
     if (q == NULL)
         return false;
+
     list_ele_t *newt;
-    newt = malloc(sizeof(list_ele_t));
-    if (newt == NULL)
+    if (!(newt = malloc(sizeof(list_ele_t))))
         return false;
-    newt->value = malloc(sizeof(char) * (strlen(s) + 1));
-    if (newt->value == NULL) {
+    if (!(newt->value = malloc(sizeof(char) * (strlen(s) + 1)))) {
         free(newt);
         return false;
     }
@@ -102,7 +100,7 @@ bool q_insert_tail(queue_t *q, char *s)
     /* What if either call to malloc returns NULL? */
     strlcpy(newt->value, s, strlen(s) + 1);
     newt->next = NULL;
-    if (q->tail == NULL) {
+    if (!q->tail) {
         q->tail = newt;
         q->head = newt;
     } else {
@@ -123,11 +121,11 @@ bool q_insert_tail(queue_t *q, char *s)
  */
 bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
 {
-    if (q == NULL || q->head == NULL)
+    if (!q || !q->head)
         return false;
 
     list_ele_t *node = q->head;
-    if (sp != NULL) {
+    if (sp) {
         strncpy(sp, node->value, bufsize - 1);
         sp[bufsize - 1] = '\0';
     }
