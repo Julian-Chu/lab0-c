@@ -160,28 +160,19 @@ int q_size(queue_t *q)
  */
 void q_reverse(queue_t *q)
 {
-    /* TODO: You need to write the code for this function */
-    /* TODO: Remove the above comment when you are about to implement. */
     if (!q || q->size <= 1)
         return;
 
-    list_ele_t *prev, *curr, *tmp;
-    prev = NULL;
+    list_ele_t *curr, *next;
     curr = q->head;
 
-    while (curr) {
-        tmp = curr->next;
-        if (!tmp) {
-            curr->next = prev;
-            prev = curr;
-            break;
-        }
-        curr->next = prev;
-        prev = curr;
-        curr = tmp;
+    while (curr->next) {
+        next = curr->next;
+        curr->next = next->next;
+        next->next = q->head;
+        q->head = next;
     }
-    q->tail = q->head;
-    q->head = prev;
+    q->tail = curr;
 }
 
 /*
@@ -195,14 +186,14 @@ void q_sort(queue_t *q)
     /* TODO: Remove the above comment when you are about to implement. */
     if (!q || !q->head)
         return;
-    q->head = node_sort(q->head);
+    q->head = merge_sort(q->head);
     q->tail = q->head;
     while (q->tail->next) {
         q->tail = q->tail->next;
     }
 }
 
-list_ele_t *node_sort(list_ele_t *node)
+list_ele_t *merge_sort(list_ele_t *node)
 {
     if (!node)
         return NULL;
@@ -217,13 +208,13 @@ list_ele_t *node_sort(list_ele_t *node)
     slow->next = NULL;
 
     list_ele_t *left, *right;
-    left = node_sort(node);
-    right = node_sort(mid);
+    left = merge_sort(node);
+    right = merge_sort(mid);
 
-    return merge_sort(left, right);
+    return merge_sort_two_nodes(left, right);
 }
 
-list_ele_t *merge_sort(list_ele_t *a, list_ele_t *b)
+list_ele_t *merge_sort_two_nodes(list_ele_t *a, list_ele_t *b)
 {
     if (!b)
         return a;
