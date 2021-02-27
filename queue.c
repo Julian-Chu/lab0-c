@@ -84,8 +84,6 @@ bool q_insert_head(queue_t *q, char *s)
  */
 bool q_insert_tail(queue_t *q, char *s)
 {
-    /* TODO: You need to write the complete code for this function */
-    /* Remember: It should operate in O(1) time */
     if (q == NULL)
         return false;
 
@@ -131,6 +129,9 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
     }
 
     q->head = q->head->next;
+    if (!q->head) {
+        q->tail = NULL;
+    }
     free(node->value);
     free(node);
     q->size--;
@@ -185,7 +186,6 @@ void q_sort(queue_t *q)
     if (!q || !q->head)
         return;
     q->head = merge_sort(q->head);
-    q->tail = q->head;
     while (q->tail->next) {
         q->tail = q->tail->next;
     }
